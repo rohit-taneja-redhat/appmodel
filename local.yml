@@ -1,0 +1,114 @@
+---
+# Source: appmodel/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: app-model-dev-appmodel
+  labels:
+    helm.sh/chart: appmodel-0.1.0
+    app.kubernetes.io/name: appmodel
+    app.kubernetes.io/instance: app-model-dev
+    env: local
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: appmodel/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-model-dev-appmodel
+  labels:
+    helm.sh/chart: appmodel-0.1.0
+    app.kubernetes.io/name: appmodel
+    app.kubernetes.io/instance: app-model-dev
+    env: local
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: appmodel
+    app.kubernetes.io/instance: app-model-dev
+    env: local
+---
+# Source: appmodel/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-model-dev-appmodel
+  labels:
+    helm.sh/chart: appmodel-0.1.0
+    app.kubernetes.io/name: appmodel
+    app.kubernetes.io/instance: app-model-dev
+    env: local
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: appmodel
+      app.kubernetes.io/instance: app-model-dev
+      env: local
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: appmodel
+        app.kubernetes.io/instance: app-model-dev
+        env: local
+    spec:
+      serviceAccountName: app-model-dev-appmodel
+      securityContext:
+        {}
+      containers:
+        - name: appmodel
+          securityContext:
+            {}
+          image: "quay.io/rtaneja/app-migration-image-build@sha256:1a13a9422701c5147ca25204fea86ff23464ed0dc8568399f2f8e6ea922a1b3a"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+---
+# Source: appmodel/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "app-model-dev-appmodel-test-connection"
+  labels:
+    helm.sh/chart: appmodel-0.1.0
+    app.kubernetes.io/name: appmodel
+    app.kubernetes.io/instance: app-model-dev
+    env: local
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['app-model-dev-appmodel:8080']
+  restartPolicy: Never
