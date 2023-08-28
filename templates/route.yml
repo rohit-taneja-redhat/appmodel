@@ -1,0 +1,18 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: {{ include "appmodel.fullname" . }}
+  labels:
+    {{- include "appmodel.labels" . | nindent 4 }}
+spec:
+  host: {{ .Values.host }}
+  to:
+    kind: Service
+    name: {{ include "appmodel.fullname" . }}
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: passthrough
+    insecureEdgeTerminationPolicy: None
+  wildcardPolicy: None
