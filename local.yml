@@ -91,6 +91,28 @@ spec:
               cpu: 100m
               memory: 128Mi
 ---
+# Source: appmodel/templates/route.yml
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: app-model-dev-appmodel
+  labels:
+    helm.sh/chart: appmodel-0.1.0
+    app.kubernetes.io/name: appmodel
+    app.kubernetes.io/instance: app-model-dev
+    env: local
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  host: appmodel-appmodel-dev.apps.shrocp4upi49.lab.upshift.rdu2.redhat.com
+  to:
+    kind: Service
+    name: app-model-dev-appmodel
+    weight: 100
+  port:
+    targetPort: http
+  wildcardPolicy: None
+---
 # Source: appmodel/templates/tests/test-connection.yaml
 apiVersion: v1
 kind: Pod

@@ -5,14 +5,16 @@ metadata:
   labels:
     {{- include "appmodel.labels" . | nindent 4 }}
 spec:
-  host: {{ .Values.host }}
+  host: {{ .Values.route.host }}
   to:
     kind: Service
     name: {{ include "appmodel.fullname" . }}
     weight: 100
   port:
     targetPort: http
+  {{- if .Values.route.tlsEnabled }}
   tls:
     termination: passthrough
     insecureEdgeTerminationPolicy: None
+  {{- end }}
   wildcardPolicy: None

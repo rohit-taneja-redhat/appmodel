@@ -6,8 +6,10 @@ replicaCount: 1
 
 env: local
 
-host: appmodel-appmodel-dev.apps.shrocp4upi49.lab.upshift.rdu2.redhat.com
-
+route:
+  tlsEnabled: false
+  host: appmodel-appmodel-dev.apps.shrocp4upi49.lab.upshift.rdu2.redhat.com
+  
 image:
   repository: quay.io/rtaneja/app-migration-image-build@sha256:1a13a9422701c5147ca25204fea86ff23464ed0dc8568399f2f8e6ea922a1b3a
   pullPolicy: IfNotPresent
